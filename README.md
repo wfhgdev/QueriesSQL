@@ -54,7 +54,7 @@ CREATE TABLE "USER"
 1.3. Creación de tabla ROLE_USER:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "ROLE_USER"
+CREATE TABLE "ROLE_USER"
 (
     id_user_roleuser integer NOT NULL,
     id_role_roleuser integer NOT NULL,
@@ -66,10 +66,11 @@ CREATE TABLE IF NOT EXISTS "ROLE_USER"
 1.4. Creación de tabla ROLE:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "ROLE"
+CREATE TABLE "ROLE"
 (
     id_role serial NOT NULL,
-    nom_role character varying(20) NOT NULL,
-    CONSTRAINT role_user_pkey PRIMARY KEY (id_role)
+    name_role character varying(20) NOT NULL,
+    CONSTRAINT role_pkey PRIMARY KEY (id_role)
 );
 ```
+
