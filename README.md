@@ -50,3 +50,17 @@ CREATE TABLE "USER"
 );
 
 ```
+
+1.3. Creación de tabla ROLE_USER:
+
+```sql
+CREATE TABLE IF NOT EXISTS "ROLE_USER"
+(
+    id_user_roleuser integer NOT NULL,
+    id_role_roleuser integer NOT NULL,
+    CONSTRAINT role_user_pkey PRIMARY KEY (id_user_roleuser,id_role_roleuser)
+);
+
+```
+
+1.4. Creación de tabla ROLE:
