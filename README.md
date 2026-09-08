@@ -17,3 +17,15 @@ Entregable esperado
 2. Respuesta escrita a las preguntas de análisis.
 
 
+1. Creacion Base de Datos:
+
+```sql
+CREATE DATABASE "InmobiliariaDB"
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LOCALE_PROVIDER = 'libc'
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+```
+2. 
