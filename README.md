@@ -64,3 +64,12 @@ CREATE TABLE IF NOT EXISTS "ROLE_USER"
 ```
 
 1.4. Creación de tabla ROLE:
+
+```sql
+CREATE TABLE IF NOT EXISTS "ROLE"
+(
+    id_role serial NOT NULL,
+    nom_role character varying(20) NOT NULL,
+    CONSTRAINT role_user_pkey PRIMARY KEY (id_role)
+);
+```
