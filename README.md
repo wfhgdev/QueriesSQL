@@ -902,3 +902,79 @@ LEFT JOIN booking b ON p.id_post = b.id_post_booking
 LEFT JOIN room_review rr ON b.id_booking = rr.id_booking_roomreview 
 WHERE rr.id_roomreview IS NULL;
 ```
+
+###  Consultas de reto
+
+```sql
+SELECT 
+    r.address_room AS habitacion, 
+    CASE WHEN r.private_bathroom_room THEN 'Privada' ELSE 'Compartida' END AS tipo, 
+    u_anfitrion.name_user || ' ' || u_anfitrion.lastname_user AS anfitrion, 
+    u_huesped.name_user || ' ' || u_huesped.lastname_user AS huesped, 
+    CASE WHEN r.wifi_room THEN 'WiFi Incluido' ELSE 'Sin WiFi' END AS servicio 
+FROM booking b 
+JOIN post p ON b.id_post_booking = p.id_post 
+JOIN room r ON p.id_room_post = r.id_room 
+JOIN "user" u_anfitrion ON r.id_owner_room = u_anfitrion.id_user 
+JOIN "user" u_huesped ON b.id_user_booking = u_huesped.id_user;
+
+SELECT 
+    CASE WHEN private_bathroom_room THEN 'Baño Privado' ELSE 'Baño Compartido' END AS tipo, 
+    COUNT(*) AS total 
+FROM room 
+GROUP BY tipo 
+HAVING COUNT(*) >= 2;
+
+SELECT u.name_user || ' ' || u.lastname_user AS anfitrion, COUNT(r.id_room) AS total_habitaciones 
+FROM room r 
+JOIN "user" u ON r.id_owner_room = u.id_user 
+GROUP BY u.id_user, u.name_user, u.lastname_user 
+ORDER BY total_habitaciones DESC 
+LIMIT 1;
+
+SELECT r.address_room, COUNT(b.id_booking) AS total_reservas 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+GROUP BY r.id_room, r.address_room 
+ORDER BY total_reservas DESC 
+LIMIT 1;
+
+SELECT u.name_user || ' ' || u.lastname_user AS huesped, COUNT(b.id_booking) AS total_reservas 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user 
+GROUP BY u.id_user, u.name_user, u.lastname_user 
+ORDER BY total_reservas DESC;
+
+SELECT DISTINCT r.id_room, r.address_room 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+WHERE (r.wifi_room = true OR r.aircon_room = true OR r.private_bathroom_room = true);
+
+SELECT DISTINCT r.id_room, r.address_room 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+WHERE (r.wifi_room = false AND r.aircon_room = false AND r.private_bathroom_room = false);
+
+SELECT 'Servicios Generales' AS servicio_no_asignado 
+WHERE NOT EXISTS (
+    SELECT 1 FROM room WHERE wifi_room = true OR aircon_room = true
+);
+
+SELECT r.address_room, SUM(p.monthly_price_post) AS ingreso_total 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+WHERE b.pay_confirm_booking = true 
+GROUP BY r.id_room, r.address_room;
+
+SELECT r.address_room, p.monthly_price_post AS valor_reserva 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+WHERE b.pay_confirm_booking = true 
+ORDER BY valor_reserva DESC 
+LIMIT 1;
+```
