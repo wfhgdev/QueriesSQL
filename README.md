@@ -1,4 +1,4 @@
-### SQL Queries - Plataforma Web de alquiler de habitaciones por William Hernández
+## SQL Queries - Plataforma Web de alquiler de habitaciones por William Hernández
 
 Objetivo general
 
@@ -36,7 +36,7 @@ CREATE DATABASE "InmobiliariaDB"
 
 ## 2. Creación de tablas:
 
-### Tablas independientes
+#### Tablas independientes
 
 ```sql
 CREATE TABLE country (
@@ -63,7 +63,7 @@ CREATE TABLE town (
 );
 ```
 
-## Tablas dependientes de Town (Municipio)
+### Tablas dependientes de Town (Municipio)
 
 ```sql
 CREATE TABLE neighborhood (
@@ -81,7 +81,7 @@ CREATE TABLE edu_center (
 );
 ```
 
-## Usuario (tabla central)
+### Usuario (tabla central)
 Nota: "user" es palabra reservada en PostgreSQL, se usa comillas dobles
 
 ```sql
@@ -100,7 +100,7 @@ CREATE TABLE "user" (
 );
 ```
 
-## Preference: relación 1 a 1 con User (PK = FK)
+### Preference: relación 1 a 1 con User (PK = FK)
 
 ```sql
 CREATE TABLE preference (
@@ -118,7 +118,7 @@ CREATE TABLE preference (
 );
 ```
 
-## Role_User: Tabla pivote con relación Muchos a Muchos entre User y Role
+### Role_User: Tabla pivote con relación Muchos a Muchos entre User y Role
 
 ```sql
 CREATE TABLE roleuser (
@@ -128,7 +128,7 @@ CREATE TABLE roleuser (
 );
 ```
 
-## Enrollment (Matricula): Relación Muchos a Muchos entre User y Edu_Center
+### Enrollment (Matricula): Relación Muchos a Muchos entre User y Edu_Center
 
 ```sql
 CREATE TABLE enrollment (
@@ -140,7 +140,7 @@ CREATE TABLE enrollment (
 );
 ```
 
-## Room (Habitación)
+### Room (Habitación)
 
 ```sql
 CREATE TABLE room (
@@ -170,7 +170,7 @@ CREATE TABLE room (
 );
 ```
 
-## Post (Publicación)
+### Post (Publicación)
 
 ```sql
 CREATE TABLE post (
@@ -185,7 +185,7 @@ CREATE TABLE post (
 );
 ```
 
-## Booking (Reserva)
+### Booking (Reserva)
 
 ```sql
 CREATE TABLE booking (
@@ -202,7 +202,7 @@ CREATE TABLE booking (
 );
 ```
 
-## User_Review y Room_Review (dependen de Booking)
+### User_Review y Room_Review (dependen de Booking)
 
 ```sql
 CREATE TABLE user_review (
@@ -224,7 +224,7 @@ CREATE TABLE room_review (
 );
 ```
 
-## Índices
+### Índices
 Se agregan para acelerar la búsqueda y recuperación de datos en una tabla
 
 ```sql  
@@ -245,7 +245,7 @@ CREATE INDEX idx_roleuser_role ON roleuser(id_role_roleuser);
 ## Insert de registros
 
 
-## 1. TABLAS INDEPENDIENTES Y CATÁLOGOS (10 registros c/u)
+### 1. TABLAS INDEPENDIENTES Y CATÁLOGOS (10 registros c/u)
 
 ```sql
 INSERT INTO country (name_country) VALUES
@@ -281,7 +281,7 @@ INSERT INTO town (name_town, province_town) VALUES
 ('Murcia', 'Murcia');
 ```
 
-## 2. TABLAS DEPENDIENTES DE TOWN (10 registros c/u)
+### 2. TABLAS DEPENDIENTES DE TOWN (10 registros c/u)
 
 ```sql
 INSERT INTO neighborhood (id_town_neighbor, name_neighbor) VALUES
@@ -309,7 +309,7 @@ INSERT INTO edu_center (town_edu, name_edu, address_edu, type_edu) VALUES
 (10, 'Universidad de Murcia', 'Av. Teniente Flomesta 5', 'Universidad Publica');
 ```
 
-## 3. USUARIOS Y SU ENTORNO (10 registros c/u)
+### 3. USUARIOS Y SU ENTORNO (10 registros c/u)
 
 ```sql
 
@@ -364,7 +364,7 @@ INSERT INTO enrollment (id_user_enroll, id_educenter_enroll, attach_enroll, exp_
 (6, 10, 'enroll_sofia_um.pdf', '2026-06-30');
 ```
 
-## 4. HABITACIONES Y PUBLICACIONES (10 registros c/u)
+### 4. HABITACIONES Y PUBLICACIONES (10 registros c/u)
 
 ```sql
 INSERT INTO room (id_owner_room, address_room, postalcode_room, floor_number_room, town_room, neighborhood_room, area_room, bed_qty_room, capacity_room, allowed_gender_room, closet_room, private_bathroom_room, shared_bathroom_room, balcony_room, aircon_room, wifi_room, allowed_kitchen_room, visit_allowed_room, smoker_room, pet_allowed_room, utilities_incl_room, status_room) VALUES
@@ -393,7 +393,7 @@ INSERT INTO post (id_publisher_post, id_room_post, timestamp_post, minimum_month
 (3, 9, '2024-02-15 19:30:00+01', 9, 410.00, 410.00, 'paused');
 ```
 
-## 5. RESERVAS Y RESEÑAS (10 registros c/u)
+### 5. RESERVAS Y RESEÑAS (10 registros c/u)
 
 -- Reservas hechas únicamente por usuarios con rol 'Student' (id_user 4 al 10)
 ```sql
@@ -435,7 +435,7 @@ INSERT INTO room_review (id_booking_roomreview, rate_room_roomreview, rate_owner
 (9, 3.0, 3.5, 'Habitación correcta según las fotos publicadas.', 5),
 (10, 4.2, 4.5, 'Instalaciones modernas y piso reformado.', 6);
 ```
-## Queries tipo SELECT
+### Queries tipo SELECT
 
 ```sql
 SELECT * FROM booking;
@@ -463,7 +463,7 @@ SELECT name_user, phone_user FROM "user" INNER JOIN roleuser ON id_user=id_user_
 WHERE id_role_roleuser=2;
 ```
 
-## Queries tipo Update
+### Queries tipo Update
 
 ```sql
 UPDATE "user" SET phone_user = 612345678
@@ -477,7 +477,7 @@ WHERE id_post = 1;
 
 ```
 
-## Queries tipo Delete
+### Queries tipo Delete
 
 ```sql
 DELETE FROM booking
@@ -491,7 +491,7 @@ DELETE FROM "user"
 WHERE id_user = 6;
 -- Aparece error y ocurre porque estás intentando eliminar un registro de la tabla user (con id_user = 6) que está siendo utilizado o referenciado por uno o más registros en la tabla booking.
 ```
-## Queries con filtros WHERE
+### Queries con filtros WHERE
 
 ```sql
 SELECT * FROM room WHERE private_bathroom_room = true;
@@ -503,7 +503,7 @@ SELECT * FROM post WHERE timestamp_post > '2024-01-01';
 SELECT * FROM "user" WHERE name_user='Carlos';
 ```
 
-## Queries con filtros LIKE
+### Queries con filtros LIKE
 
 ```sql
 SELECT * FROM "user" FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
@@ -515,7 +515,7 @@ SELECT * FROM preference WHERE wifi_preference=true;
 SELECT * FROM room INNER JOIN town ON town_room=id_town
 WHERE name_town LIKE '%a%';
 ```
-## Queries de ordenamiento
+### Queries de ordenamiento
 
 ```sql
 SELECT * FROM room ORDER BY address_room ASC;
@@ -533,3 +533,5 @@ JOIN role r ON ru.id_role_roleuser = r.id_role
 WHERE r.name_role = 'Owner' 
 ORDER BY u.name_user DESC;
 ```
+
+###
