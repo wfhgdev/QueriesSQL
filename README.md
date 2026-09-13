@@ -434,9 +434,8 @@ INSERT INTO room_review (id_booking_roomreview, rate_room_roomreview, rate_owner
 (8, 5.0, 5.0, 'A 5 minutos a pie del campus, recomendada.', 4),
 (9, 3.0, 3.5, 'Habitación correcta según las fotos publicadas.', 5),
 (10, 4.2, 4.5, 'Instalaciones modernas y piso reformado.', 6);
-
 ```
-## Consulta tipo SELECT
+## Queries tipo SELECT
 
 ```sql
 SELECT * FROM booking;
@@ -462,4 +461,64 @@ SELECT address_room, postalcode_room, name_town FROM room INNER JOIN town ON tow
 
 SELECT name_user, phone_user FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
 WHERE id_role_roleuser=2;
+```
+
+## Queries tipo Update
+
+```sql
+UPDATE "user" SET phone_user = 612345678
+WHERE id_user = 11;
+
+UPDATE booking SET status_booking = 'confirmed'
+WHERE id_booking = 1;
+
+UPDATE post SET monthly_price_post = 1600
+WHERE id_post = 1;
+
+```
+
+## Queries tipo Delete
+
+```sql
+DELETE FROM booking
+WHERE id_booking = 1;
+
+DELETE FROM room
+WHERE id_room = 9;
+-- Aparece error y ocurre porque estás intentando eliminar un registro de la tabla room (con id_room = 9) que está siendo utilizado o referenciado por uno o más registros en la tabla post.
+
+DELETE FROM "user"
+WHERE id_user = 6;
+-- Aparece error y ocurre porque estás intentando eliminar un registro de la tabla user (con id_user = 6) que está siendo utilizado o referenciado por uno o más registros en la tabla booking.
+```
+## Queries con filtros WHERE
+
+```sql
+SELECT * FROM room WHERE private_bathroom_room = true;
+SELECT * FROM room WHERE shared_bathroom_room = true;
+SELECT * FROM booking WHERE status_booking = 'pending';
+SELECT * FROM booking WHERE status_booking = 'active';
+SELECT * FROM post WHERE (monthly_price_post/30) > 120000;
+SELECT * FROM post WHERE timestamp_post > '2024-01-01';
+SELECT * FROM "user" WHERE name_user='Carlos';
+```
+
+## Queries con filtros LIKE
+
+```sql
+SELECT * FROM "user" FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
+WHERE id_role_roleuser=1 AND name_user LIKE 'L%';
+SELECT * FROM "user" FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
+WHERE id_role_roleuser=2 AND name_user LIKE 'M%';
+SELECT * FROM room FROM room WHERE address_room LIKE '%Centro%';
+SELECT * FROM preference WHERE wifi_preference=true;
+SELECT * FROM room INNER JOIN town ON town_room=id_town
+WHERE name_town LIKE '%a%';
+```
+## Queries de ordenamiento
+
+```sql
+SELECT * FROM room ORDER BY price_room ASC;
+SELECT * FROM room ORDER BY price_room DESC;
+SELECT * FROM post ORDER BY timestamp_post DESC;
 ```
