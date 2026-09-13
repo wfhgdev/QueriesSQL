@@ -796,3 +796,109 @@ WHERE (CASE WHEN wifi_room THEN 1 ELSE 0 END +
        CASE WHEN closet_room THEN 1 ELSE 0 END + 
        CASE WHEN private_bathroom_room THEN 1 ELSE 0 END) > 1;
 ```
+
+### Subconsultas
+
+```sql
+SELECT r.address_room, (p.monthly_price_post / 30) AS precio_noche 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+WHERE (p.monthly_price_post / 30) > (
+    SELECT AVG(monthly_price_post / 30) FROM post
+);
+
+SELECT b.id_booking, p.monthly_price_post 
+FROM booking b 
+JOIN post p ON b.id_post_booking = p.id_post 
+WHERE p.monthly_price_post > (
+    SELECT AVG(p2.monthly_price_post) 
+    FROM booking b2 
+    JOIN post p2 ON b2.id_post_booking = p2.id_post
+);
+
+SELECT * 
+FROM room 
+WHERE id_room IN (
+    SELECT p.id_room_post 
+    FROM post p 
+    JOIN booking b ON p.id_post = b.id_post_booking
+);
+
+SELECT * 
+FROM room 
+WHERE id_room NOT IN (
+    SELECT p.id_room_post 
+    FROM post p 
+    JOIN booking b ON p.id_post = b.id_post_booking
+);
+
+SELECT * 
+FROM "user" 
+WHERE id_user IN (
+    SELECT DISTINCT id_owner_room FROM room
+);
+
+SELECT * 
+FROM "user" 
+WHERE id_user IN (
+    SELECT id_user_booking 
+    FROM booking 
+    WHERE status_booking = 'confirmed'
+);
+
+SELECT r.address_room 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+GROUP BY r.id_room, r.address_room 
+HAVING COUNT(b.id_booking) = (
+    SELECT MAX(cant) FROM (
+        SELECT COUNT(b2.id_booking) AS cant 
+        FROM booking b2 
+        JOIN post p2 ON b2.id_post_booking = p2.id_post 
+        GROUP BY p2.id_room_post
+    ) AS sub
+);
+
+SELECT r.address_room, (p.monthly_price_post / 30) AS precio_noche 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+WHERE (p.monthly_price_post / 30) = (
+    SELECT MAX(monthly_price_post / 30) FROM post
+);
+```
+
+### LEFT JOIN y análisis de datos faltantes
+
+```sql
+SELECT u.* 
+FROM "user" u 
+JOIN roleuser ru ON u.id_user = ru.id_user_roleuser 
+JOIN role r ON ru.id_role_roleuser = r.id_role 
+LEFT JOIN room rm ON u.id_user = rm.id_owner_room 
+WHERE r.name_role = 'Owner' AND rm.id_room IS NULL;
+
+SELECT r.* 
+FROM room r 
+LEFT JOIN post p ON r.id_room = p.id_room_post 
+LEFT JOIN booking b ON p.id_post = b.id_post_booking 
+WHERE b.id_booking IS NULL;
+
+SELECT * 
+FROM room 
+WHERE wifi_room = false AND aircon_room = false AND private_bathroom_room = false AND balcony_room = false AND closet_room = false;
+
+SELECT u.* 
+FROM "user" u 
+JOIN roleuser ru ON u.id_user = ru.id_user_roleuser 
+JOIN role r ON ru.id_role_roleuser = r.id_role 
+LEFT JOIN booking b ON u.id_user = b.id_user_booking 
+WHERE r.name_role = 'Student' AND b.id_booking IS NULL;
+
+SELECT r.* 
+FROM room r 
+LEFT JOIN post p ON r.id_room = p.id_room_post 
+LEFT JOIN booking b ON p.id_post = b.id_post_booking 
+LEFT JOIN room_review rr ON b.id_booking = rr.id_booking_roomreview 
+WHERE rr.id_roomreview IS NULL;
+```
