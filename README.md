@@ -436,3 +436,30 @@ INSERT INTO room_review (id_booking_roomreview, rate_room_roomreview, rate_owner
 (10, 4.2, 4.5, 'Instalaciones modernas y piso reformado.', 6);
 
 ```
+## Consulta tipo SELECT
+
+```sql
+SELECT * FROM booking;
+SELECT * FROM country;
+SELECT * FROM edu_center;
+SELECT * FROM enrollment;
+SELECT * FROM neighborhood;
+SELECT * FROM pay_method;
+SELECT * FROM post;
+SELECT * FROM preference;
+SELECT * FROM "role";
+SELECT * FROM roleuser;
+SELECT * FROM room;
+SELECT * FROM room_review;
+SELECT * FROM town;
+SELECT * FROM "user";
+SELECT * FROM user_review;
+
+SELECT name_user, mail_user FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
+WHERE id_role_roleuser=1;
+
+SELECT address_room, postalcode_room, name_town FROM room INNER JOIN town ON town_room=id_town;
+
+SELECT name_user, phone_user FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
+WHERE id_role_roleuser=2;
+```
