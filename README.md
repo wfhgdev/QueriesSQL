@@ -1,4 +1,4 @@
-### Queries SQL - plataforma de alquiler de habitaciones by William Hernández
+### SQL Queries - Plataforma Web de alquiler de habitaciones por William Hernández
 
 Objetivo general
 
@@ -224,7 +224,8 @@ CREATE TABLE room_review (
 );
 ```
 
-## Índices (Se agregan para acelerar la búsqueda y recuperación de datos en una tabla)
+## Índices
+Se agregan para acelerar la búsqueda y recuperación de datos en una tabla
 
 ```sql  
 CREATE INDEX idx_room_owner ON room(id_owner_room);
@@ -238,3 +239,6 @@ CREATE INDEX idx_enrollment_edu ON enrollment(id_educenter_enroll);
 CREATE INDEX idx_roleuser_user ON roleuser(id_user_roleuser);
 CREATE INDEX idx_roleuser_role ON roleuser(id_role_roleuser);
 ```
+
+---
+
