@@ -682,3 +682,44 @@ SELECT id_room, address_room
 FROM room 
 WHERE wifi_room = false AND aircon_room = false AND private_bathroom_room = false;
 ```
+### Funciones de agregación
+
+```sql
+SELECT COUNT(DISTINCT id_user_roleuser) AS total_anfitriones 
+FROM roleuser ru 
+JOIN role r ON ru.id_role_roleuser = r.id_role 
+WHERE r.name_role = 'Owner';
+
+SELECT COUNT(DISTINCT id_user_roleuser) AS total_huespedes 
+FROM roleuser ru 
+JOIN role r ON ru.id_role_roleuser = r.id_role 
+WHERE r.name_role = 'Student';
+
+SELECT COUNT(DISTINCT id_room_post) AS habitaciones_publicadas 
+FROM post;
+
+SELECT COUNT(*) AS total_reservas 
+FROM booking;
+
+SELECT AVG(monthly_price_post / 30) AS precio_promedio_noche 
+FROM post;
+
+SELECT r.address_room, MAX(p.monthly_price_post / 30) AS max_precio_noche 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+GROUP BY r.address_room 
+ORDER BY max_precio_noche DESC 
+LIMIT 1;
+
+SELECT r.address_room, MIN(p.monthly_price_post / 30) AS min_precio_noche 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+GROUP BY r.address_room 
+ORDER BY min_precio_noche ASC 
+LIMIT 1;
+
+SELECT SUM(p.monthly_price_post) AS total_ingresos 
+FROM booking b 
+JOIN post p ON b.id_post_booking = p.id_post 
+WHERE b.pay_confirm_booking = true;
+```
