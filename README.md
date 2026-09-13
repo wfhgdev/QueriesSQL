@@ -636,3 +636,49 @@ JOIN post p ON b.id_post_booking = p.id_post
 JOIN room r ON p.id_room_post = r.id_room 
 JOIN "user" u_anfitrion ON r.id_owner_room = u_anfitrion.id_user;
 ```
+
+### Consultas de negocio con JOIN
+
+```sql
+SELECT r.* 
+FROM room r 
+JOIN "user" u ON r.id_owner_room = u.id_user 
+WHERE u.name_user = 'Carlos' AND u.lastname_user = 'Gómez';
+
+SELECT b.* 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user 
+WHERE u.name_user = 'Laura' AND u.lastname_user = 'López';
+
+SELECT address_room, wifi_room, aircon_room, balcony_room, closet_room, private_bathroom_room 
+FROM room 
+WHERE address_room = 'Calle Pez 12, 3A';
+
+SELECT u.name_user || ' ' || u.lastname_user AS huesped 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user 
+JOIN post p ON b.id_post_booking = p.id_post 
+JOIN room r ON p.id_room_post = r.id_room 
+WHERE r.address_room = 'Calle Pez 12, 3A';
+
+SELECT DISTINCT r.id_room, r.address_room 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+JOIN room_review rr ON b.id_booking = rr.id_booking_roomreview;
+
+SELECT r.id_room, r.address_room 
+FROM room r 
+LEFT JOIN post p ON r.id_room = p.id_room_post 
+LEFT JOIN booking b ON p.id_post = b.id_post_booking 
+LEFT JOIN room_review rr ON b.id_booking = rr.id_booking_roomreview 
+WHERE rr.id_roomreview IS NULL;
+
+SELECT id_room, address_room 
+FROM room 
+WHERE wifi_room = true OR aircon_room = true OR private_bathroom_room = true;
+
+SELECT id_room, address_room 
+FROM room 
+WHERE wifi_room = false AND aircon_room = false AND private_bathroom_room = false;
+```
