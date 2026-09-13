@@ -764,3 +764,35 @@ JOIN town t ON r.town_room = t.id_town
 JOIN post p ON r.id_room = p.id_room_post 
 GROUP BY t.name_town;
 ```
+
+### GROUP BY + HAVING
+
+```sql
+SELECT u.name_user || ' ' || u.lastname_user AS anfitrion, COUNT(r.id_room) AS total_habitaciones 
+FROM room r 
+JOIN "user" u ON r.id_owner_room = u.id_user 
+GROUP BY u.id_user, u.name_user, u.lastname_user 
+HAVING COUNT(r.id_room) > 1;
+
+SELECT 
+    CASE WHEN r.private_bathroom_room THEN 'Baño Privado' ELSE 'Baño Compartido' END AS tipo, 
+    COUNT(p.id_post) AS publicaciones 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+GROUP BY tipo 
+HAVING COUNT(p.id_post) > 1;
+
+SELECT u.name_user || ' ' || u.lastname_user AS huesped, COUNT(b.id_booking) AS total_reservas 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user 
+GROUP BY u.id_user, u.name_user, u.lastname_user 
+HAVING COUNT(b.id_booking) > 1;
+
+SELECT address_room 
+FROM room 
+WHERE (CASE WHEN wifi_room THEN 1 ELSE 0 END + 
+       CASE WHEN aircon_room THEN 1 ELSE 0 END + 
+       CASE WHEN balcony_room THEN 1 ELSE 0 END + 
+       CASE WHEN closet_room THEN 1 ELSE 0 END + 
+       CASE WHEN private_bathroom_room THEN 1 ELSE 0 END) > 1;
+```
