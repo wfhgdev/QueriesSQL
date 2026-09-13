@@ -16,61 +16,209 @@ Entregable esperado
 1. El script de sus consultas SQL (todo debe hacerse con lenguaje SQL, no de manera manual)
 2. Respuesta escrita a las preguntas de análisis.
 
+### Creación de base de datos: DB_Inmobiliaria
+### Motor: PostgreSQL
 
-1.1. Creacion Base de Datos:
 
-```sql
-CREATE DATABASE "InmobiliariaDB"
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LOCALE_PROVIDER = 'libc'
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-```
-
-1.2. Creación de tabla usuario:
+### Tablas independientes
 
 ```sql
-CREATE TABLE "USER"
-(
-    id_user serial NOT NULL,
-    num_docu_user character varying(30) NOT NULL,
-    type_docu_user character varying(20) NOT NULL,
-    name_user character varying(100) NOT NULL,
-    lastname_user character varying(100) NOT NULL,
-    birthyear_user integer NOT NULL,
-    gender_user character varying(20) NOT NULL,
-    mail_user character varying(150) NOT NULL,
-    phone_user character varying(20),
-    country_resi_user integer,
-    status_user boolean NOT NULL,
-    CONSTRAINT user_pkey PRIMARY KEY (id_user),
-    CONSTRAINT user_mail_user_key UNIQUE (mail_user)
+CREATE TABLE country (
+    id_country     SERIAL PRIMARY KEY,
+    name_country  VARCHAR(100) NOT NULL
 );
 
-```
-
-1.3. Creación de tabla ROLE_USER:
-
-```sql
-CREATE TABLE "ROLE_USER"
-(
-    id_user_roleuser integer NOT NULL,
-    id_role_roleuser integer NOT NULL,
-    CONSTRAINT role_user_pkey PRIMARY KEY (id_user_roleuser,id_role_roleuser)
+CREATE TABLE role (
+    id_role    SERIAL PRIMARY KEY,
+    name_role  VARCHAR(30) NOT NULL
 );
 
-```
+CREATE TABLE pay_method (
+    id_pay      SERIAL PRIMARY KEY,
+    name_pay    VARCHAR(100) NOT NULL,
+    type_pay    VARCHAR(50),
+    status_pay  VARCHAR(20) DEFAULT 'active'
+);
 
-1.4. Creación de tabla ROLE:
-
-```sql
-CREATE TABLE "ROLE"
-(
-    id_role serial NOT NULL,
-    name_role character varying(20) NOT NULL,
-    CONSTRAINT role_pkey PRIMARY KEY (id_role)
+CREATE TABLE town (
+    id_town        SERIAL PRIMARY KEY,
+    name_town      VARCHAR(100) NOT NULL,
+    province_town  VARCHAR(100)
 );
 ```
 
+## Tablas dependientes de Town (municipio)
+
+```sql
+CREATE TABLE neighborhood (
+    id_neighbor       SERIAL PRIMARY KEY,
+    id_town_neighbor  INTEGER NOT NULL REFERENCES town(id_town),
+    name_neighbor     VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE edu_center (
+    id_edu       SERIAL PRIMARY KEY,
+    town_edu     INTEGER REFERENCES town(id_town),
+    name_edu     VARCHAR(150) NOT NULL,
+    address_edu  VARCHAR(200),
+    type_edu     VARCHAR(50)
+);
+```
+
+## Usuario (tabla central)
+Nota: "user" es palabra reservada en PostgreSQL, se usa comillas dobles
+
+```sql
+CREATE TABLE "user" (
+    id_user            SERIAL PRIMARY KEY,
+    num_docu_user      VARCHAR(30) NOT NULL,
+    type_docu_user     VARCHAR(20),
+    name_user          VARCHAR(100) NOT NULL,
+    lastname_user      VARCHAR(100) NOT NULL,
+    birthyear_user     INTEGER,
+    gender_user        VARCHAR(20),
+    mail_user          VARCHAR(150) NOT NULL UNIQUE,
+    phone_user         VARCHAR(20),
+    country_resi_user  INTEGER REFERENCES country(id_country),
+    status_user        VARCHAR(20) DEFAULT 'active'
+);
+```
+
+## Preference: relación 1 a 1 con User (PK = FK)
+
+```sql
+CREATE TABLE preference (
+    id_user_pref          INTEGER PRIMARY KEY REFERENCES "user"(id_user),
+    pet_owner_pref        BOOLEAN DEFAULT FALSE,
+    smoker_pref           BOOLEAN DEFAULT FALSE,
+    aircon_pref           BOOLEAN DEFAULT FALSE,
+    wifi_pref             BOOLEAN DEFAULT FALSE,
+    private_bathroom_pref BOOLEAN DEFAULT FALSE,
+    closet_pref           BOOLEAN DEFAULT FALSE,
+    kitchen_pref          BOOLEAN DEFAULT FALSE,
+    balcony_pref          BOOLEAN DEFAULT FALSE,
+    visit_allow_pref      BOOLEAN DEFAULT FALSE,
+    utilities_incl_pref   BOOLEAN DEFAULT FALSE
+);
+```
+
+## Role_User: Relación Muchos a Muchos entre User y Role
+
+```sql
+CREATE TABLE roleuser (
+    id_user_roleuser  INTEGER NOT NULL REFERENCES "user"(id_user),
+    id_role_roleuser  INTEGER NOT NULL REFERENCES role(id_role),
+    PRIMARY KEY (id_user_roleuser, id_role_roleuser)
+);
+```
+
+## Enrollment: Relación Muchos a Muchos entre User y Edu_Center
+
+```sql
+CREATE TABLE enrollment (
+    id_enroll            SERIAL PRIMARY KEY,
+    id_user_enroll       INTEGER NOT NULL REFERENCES "user"(id_user),
+    id_educenter_enroll  INTEGER NOT NULL REFERENCES edu_center(id_edu),
+    attach_enroll        VARCHAR(255),
+    exp_date_enroll      DATE
+);
+```
+
+## Room
+
+```sql
+CREATE TABLE room (
+    id_room                SERIAL PRIMARY KEY,
+    id_owner_room          INTEGER NOT NULL REFERENCES "user"(id_user),
+    address_room           VARCHAR(200) NOT NULL,
+    postalcode_room        VARCHAR(20),
+    floor_number_room      INTEGER,
+    town_room              INTEGER REFERENCES town(id_town),
+    neighborhood_room      INTEGER REFERENCES neighborhood(id_neighbor),
+    area_room              NUMERIC(6,2),
+    bed_qty_room           INTEGER,
+    capacity_room          INTEGER,
+    allowed_gender_room    VARCHAR(10) CHECK (allowed_gender_room IN ('Male', 'Female', 'Any')),
+    closet_room            BOOLEAN DEFAULT FALSE,
+    private_bathroom_room  BOOLEAN DEFAULT FALSE,
+    shared_bathroom_room   BOOLEAN DEFAULT FALSE,
+    balcony_room           BOOLEAN DEFAULT FALSE,
+    aircon_room            BOOLEAN DEFAULT FALSE,
+    wifi_room              BOOLEAN DEFAULT FALSE,
+    allowed_kitchen_room   BOOLEAN DEFAULT FALSE,
+    visit_allowed_room     BOOLEAN DEFAULT FALSE,
+    smoker_room            BOOLEAN DEFAULT FALSE,
+    pet_allowed_room       BOOLEAN DEFAULT FALSE,
+    utilities_incl_room    BOOLEAN DEFAULT FALSE,
+    status_room            VARCHAR(20) DEFAULT 'available'
+);
+```
+
+## Post
+
+```sql
+CREATE TABLE post (
+    id_post              SERIAL PRIMARY KEY,
+    id_publisher_post    INTEGER NOT NULL REFERENCES "user"(id_user),
+    id_room_post         INTEGER NOT NULL REFERENCES room(id_room),
+    timestamp_post       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    minimum_months_post  INTEGER CHECK (minimum_months_post > 0),
+    monthly_price_post   NUMERIC(10,2) NOT NULL CHECK (monthly_price_post >= 0),
+    deposit_price_post   NUMERIC(10,2) CHECK (deposit_price_post >= 0),
+    status_post          VARCHAR(10) DEFAULT 'active' CHECK (status_post IN ('active', 'paused', 'closed', 'expired'))
+);
+```
+
+## Booking
+
+```sql
+CREATE TABLE booking (
+    id_booking           SERIAL PRIMARY KEY,
+    id_user_booking      INTEGER NOT NULL REFERENCES "user"(id_user),
+    id_post_booking      INTEGER NOT NULL REFERENCES post(id_post),
+    datetime_booking     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    pay_method_booking   INTEGER REFERENCES pay_method(id_pay),
+    start_date_booking   DATE NOT NULL,
+    end_date_booking     DATE NOT NULL,
+    pay_confirm_booking  BOOLEAN DEFAULT FALSE,
+    status_booking       VARCHAR(20) DEFAULT 'pending' CHECK (status_booking IN ('pending', 'confirmed', 'cancelled', 'completed')),
+    CONSTRAINT chk_dates CHECK (end_date_booking > start_date_booking)
+);
+```
+
+## User_Review y Room_Review (dependen de Booking)
+
+```sql
+CREATE TABLE user_review (
+    id_userreview           SERIAL PRIMARY KEY,
+    id_booking_userreview   INTEGER NOT NULL REFERENCES booking(id_booking),
+    id_reviewed_user        INTEGER NOT NULL REFERENCES "user"(id_user),
+    rate_userreview         NUMERIC(2,1) CHECK (rate_userreview BETWEEN 1.0 AND 5.0),
+    desc_userreview         TEXT,
+    author_userreview       INTEGER NOT NULL REFERENCES "user"(id_user)
+);
+
+CREATE TABLE room_review (
+    id_roomreview           SERIAL PRIMARY KEY,
+    id_booking_roomreview   INTEGER NOT NULL REFERENCES booking(id_booking),
+    rate_room_roomreview    NUMERIC(2,1) CHECK (rate_room_roomreview BETWEEN 1.0 AND 5.0),
+    rate_owner_roomreview   NUMERIC(2,1) CHECK (rate_owner_roomreview BETWEEN 1.0 AND 5.0),
+    desc_roomreview         TEXT,
+    author_roomreview       INTEGER NOT NULL REFERENCES "user"(id_user)
+);
+```
+
+## Índices
+
+```sql  
+CREATE INDEX idx_room_owner ON room(id_owner_room);
+CREATE INDEX idx_room_town ON room(town_room);
+CREATE INDEX idx_post_room ON post(id_room_post);
+CREATE INDEX idx_post_publisher ON post(id_publisher_post);
+CREATE INDEX idx_booking_user ON booking(id_user_booking);
+CREATE INDEX idx_booking_post ON booking(id_post_booking);
+CREATE INDEX idx_enrollment_user ON enrollment(id_user_enroll);
+CREATE INDEX idx_enrollment_edu ON enrollment(id_educenter_enroll);
+CREATE INDEX idx_roleuser_user ON roleuser(id_user_roleuser);
+CREATE INDEX idx_roleuser_role ON roleuser(id_role_roleuser);
+```
