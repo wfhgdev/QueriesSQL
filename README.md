@@ -723,3 +723,44 @@ FROM booking b
 JOIN post p ON b.id_post_booking = p.id_post 
 WHERE b.pay_confirm_booking = true;
 ```
+
+### Group by
+
+```sql
+SELECT 
+    CASE WHEN private_bathroom_room THEN 'Baño Privado' ELSE 'Baño Compartido' END AS tipo, 
+    COUNT(*) AS cantidad 
+FROM room 
+GROUP BY tipo;
+
+SELECT u.name_user || ' ' || u.lastname_user AS anfitrion, COUNT(r.id_room) AS total_habitaciones 
+FROM room r 
+JOIN "user" u ON r.id_owner_room = u.id_user 
+GROUP BY u.id_user, u.name_user, u.lastname_user;
+
+SELECT u.name_user || ' ' || u.lastname_user AS huesped, COUNT(b.id_booking) AS total_reservas 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user 
+GROUP BY u.id_user, u.name_user, u.lastname_user;
+
+SELECT r.address_room AS habitacion, COUNT(b.id_booking) AS total_reservas 
+FROM booking b 
+JOIN post p ON b.id_post_booking = p.id_post 
+JOIN room r ON p.id_room_post = r.id_room 
+GROUP BY r.id_room, r.address_room;
+
+SELECT 
+    address_room, 
+    (CASE WHEN wifi_room THEN 1 ELSE 0 END + 
+     CASE WHEN aircon_room THEN 1 ELSE 0 END + 
+     CASE WHEN balcony_room THEN 1 ELSE 0 END + 
+     CASE WHEN closet_room THEN 1 ELSE 0 END + 
+     CASE WHEN private_bathroom_room THEN 1 ELSE 0 END) AS total_servicios 
+FROM room;
+
+SELECT t.name_town AS ciudad, AVG(p.monthly_price_post / 30) AS precio_promedio 
+FROM room r 
+JOIN town t ON r.town_room = t.id_town 
+JOIN post p ON r.id_room = p.id_room_post 
+GROUP BY t.name_town;
+```
