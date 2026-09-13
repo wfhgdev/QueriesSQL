@@ -978,3 +978,37 @@ WHERE b.pay_confirm_booking = true
 ORDER BY valor_reserva DESC 
 LIMIT 1;
 ```
+
+### Preguntas de análisis
+
+¿Cómo identificarías si una relación 1:1 entre reservas y pagos está bien implementada?
+
+```text
+Se identifica verificando que la clave foránea en la tabla secundaria de pagos tenga una restricción UNIQUE asignada, garantizando que una reserva solo pueda vincularse como máximo a un único pago.
+```
+¿Qué consulta usarías para demostrar que la relación entre habitaciones y servicios es muchos a muchos?
+
+```text
+Se demuestra evaluando que una misma habitación posee múltiples flags de servicios habilitados y que cada tipo de servicio está activo en múltiples habitaciones:
+```
+```sql
+SELECT id_room, wifi_room, aircon_room, private_bathroom_room FROM room;
+```
+
+¿Qué diferencia hay entre usar JOIN y LEFT JOIN?
+
+```text
+JOIN (INNER JOIN): Retorna únicamente las filas donde existe coincidencia en ambas tablas.
+
+LEFT JOIN: Retorna todas las filas de la tabla izquierda y, si no existen coincidencias en la tabla derecha, completa las columnas con valores NULL.
+```
+
+¿Cuándo usarías una subconsulta en lugar de un JOIN?
+
+```text
+Se utiliza una subconsulta cuando:
+
+Se necesita comparar un valor individual contra agregaciones calculadas previamente (ej. buscar elementos cuyo valor sea mayor al AVG()).
+
+Se requiere verificar existencia mediante operadores IN, NOT IN, EXISTS o NOT EXISTS sin duplicar filas del conjunto de datos resultante.
+```
