@@ -518,7 +518,18 @@ WHERE name_town LIKE '%a%';
 ## Queries de ordenamiento
 
 ```sql
-SELECT * FROM room ORDER BY price_room ASC;
-SELECT * FROM room ORDER BY price_room DESC;
-SELECT * FROM post ORDER BY timestamp_post DESC;
+SELECT * FROM room ORDER BY address_room ASC;
+SELECT r.*, p.monthly_price_post, (p.monthly_price_post / 30) AS price_per_night 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+ORDER BY price_per_night DESC;
+SELECT * 
+FROM booking 
+ORDER BY start_date_booking ASC;
+SELECT DISTINCT u.* 
+FROM "user" u 
+JOIN roleuser ru ON u.id_user = ru.id_user_roleuser 
+JOIN role r ON ru.id_role_roleuser = r.id_role 
+WHERE r.name_role = 'Owner' 
+ORDER BY u.name_user DESC;
 ```
