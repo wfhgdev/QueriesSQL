@@ -16,9 +16,25 @@ Entregable esperado
 1. El script de sus consultas SQL (todo debe hacerse con lenguaje SQL, no de manera manual)
 2. Respuesta escrita a las preguntas de análisis.
 
+---
+
 ### Creación de base de datos: DB_Inmobiliaria
 ### Motor: PostgreSQL
 
+## 1. Creacion Base de Datos:
+
+```sql
+CREATE DATABASE "InmobiliariaDB"
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_CTYPE = 'es-ES'
+    LOCALE_PROVIDER = 'libc'
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+```
+
+## 2. Creación de tablas:
 
 ### Tablas independientes
 
@@ -47,7 +63,7 @@ CREATE TABLE town (
 );
 ```
 
-## Tablas dependientes de Town (municipio)
+## Tablas dependientes de Town (Municipio)
 
 ```sql
 CREATE TABLE neighborhood (
@@ -102,7 +118,7 @@ CREATE TABLE preference (
 );
 ```
 
-## Role_User: Relación Muchos a Muchos entre User y Role
+## Role_User: Tabla pivote con relación Muchos a Muchos entre User y Role
 
 ```sql
 CREATE TABLE roleuser (
@@ -112,7 +128,7 @@ CREATE TABLE roleuser (
 );
 ```
 
-## Enrollment: Relación Muchos a Muchos entre User y Edu_Center
+## Enrollment (Matricula): Relación Muchos a Muchos entre User y Edu_Center
 
 ```sql
 CREATE TABLE enrollment (
@@ -124,7 +140,7 @@ CREATE TABLE enrollment (
 );
 ```
 
-## Room
+## Room (Habitación)
 
 ```sql
 CREATE TABLE room (
@@ -154,7 +170,7 @@ CREATE TABLE room (
 );
 ```
 
-## Post
+## Post (Publicación)
 
 ```sql
 CREATE TABLE post (
@@ -169,7 +185,7 @@ CREATE TABLE post (
 );
 ```
 
-## Booking
+## Booking (Reserva)
 
 ```sql
 CREATE TABLE booking (
@@ -208,7 +224,7 @@ CREATE TABLE room_review (
 );
 ```
 
-## Índices
+## Índices (Se agregan para acelerar la búsqueda y recuperación de datos en una tabla)
 
 ```sql  
 CREATE INDEX idx_room_owner ON room(id_owner_room);
