@@ -534,4 +534,24 @@ WHERE r.name_role = 'Owner'
 ORDER BY u.name_user DESC;
 ```
 
-###
+### Rangos y listas
+
+```sql
+SELECT r.*, (p.monthly_price_post / 30) AS price_per_night 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post 
+WHERE (p.monthly_price_post / 30) BETWEEN 80000 AND 200000;
+
+SELECT * 
+FROM room 
+WHERE private_bathroom_room = true OR shared_bathroom_room = true;
+
+SELECT * 
+FROM booking 
+WHERE status_booking IN ('pending', 'confirmed');
+
+SELECT r.*, t.name_town 
+FROM room r 
+JOIN town t ON r.town_room = t.id_town 
+WHERE t.name_town IN ('Bogotá', 'Medellín', 'Madrid', 'Barcelona');
+```
