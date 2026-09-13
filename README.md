@@ -508,10 +508,14 @@ SELECT * FROM "user" WHERE name_user='Carlos';
 ```sql
 SELECT * FROM "user" FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
 WHERE id_role_roleuser=1 AND name_user LIKE 'L%';
+
 SELECT * FROM "user" FROM "user" INNER JOIN roleuser ON id_user=id_user_roleuser
 WHERE id_role_roleuser=2 AND name_user LIKE 'M%';
+
 SELECT * FROM room FROM room WHERE address_room LIKE '%Centro%';
+
 SELECT * FROM preference WHERE wifi_preference=true;
+
 SELECT * FROM room INNER JOIN town ON town_room=id_town
 WHERE name_town LIKE '%a%';
 ```
@@ -519,13 +523,16 @@ WHERE name_town LIKE '%a%';
 
 ```sql
 SELECT * FROM room ORDER BY address_room ASC;
+
 SELECT r.*, p.monthly_price_post, (p.monthly_price_post / 30) AS price_per_night 
 FROM room r 
 JOIN post p ON r.id_room = p.id_room_post 
 ORDER BY price_per_night DESC;
+
 SELECT * 
 FROM booking 
 ORDER BY start_date_booking ASC;
+
 SELECT DISTINCT u.* 
 FROM "user" u 
 JOIN roleuser ru ON u.id_user = ru.id_user_roleuser 
@@ -554,4 +561,78 @@ SELECT r.*, t.name_town
 FROM room r 
 JOIN town t ON r.town_room = t.id_town 
 WHERE t.name_town IN ('Bogotá', 'Medellín', 'Madrid', 'Barcelona');
+```
+
+### Relaciones con JOIN
+
+```sql
+SELECT r.address_room AS titulo_habitacion, u.name_user || ' ' || u.lastname_user AS anfitrion 
+FROM room r 
+JOIN "user" u ON r.id_owner_room = u.id_user;
+
+SELECT 
+    r.address_room AS titulo_habitacion, 
+    CASE WHEN r.private_bathroom_room THEN 'Privada' ELSE 'Compartida' END AS tipo_habitacion, 
+    u.name_user || ' ' || u.lastname_user AS anfitrion 
+FROM room r 
+JOIN "user" u ON r.id_owner_room = u.id_user;
+
+SELECT b.*, u.name_user || ' ' || u.lastname_user AS huesped 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user;
+
+SELECT b.*, r.address_room AS titulo_habitacion 
+FROM booking b 
+JOIN post p ON b.id_post_booking = p.id_post 
+JOIN room r ON p.id_room_post = r.id_room;
+
+SELECT 
+    b.id_booking, 
+    u.name_user || ' ' || u.lastname_user AS huesped, 
+    r.address_room AS habitacion, 
+    b.start_date_booking AS check_in, 
+    b.end_date_booking AS check_out, 
+    b.status_booking AS estado 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user 
+JOIN post p ON b.id_post_booking = p.id_post 
+JOIN room r ON p.id_room_post = r.id_room;
+
+SELECT b.id_booking, b.pay_confirm_booking, pm.name_pay, u.name_user || ' ' || u.lastname_user AS huesped 
+FROM booking b 
+JOIN "user" u ON b.id_user_booking = u.id_user 
+LEFT JOIN pay_method pm ON b.pay_method_booking = pm.id_pay;
+
+SELECT id_room, address_room, wifi_room, aircon_room, balcony_room, closet_room, private_bathroom_room 
+FROM room;
+
+SELECT 
+    r.address_room AS habitacion, 
+    'Wi-Fi / Aire Acondicionado' AS servicio, 
+    p.deposit_price_post AS costo_adicional, 
+    r.status_room AS disponibilidad 
+FROM room r 
+JOIN post p ON r.id_room = p.id_room_post;
+
+SELECT 
+    r.address_room AS habitacion, 
+    u.name_user || ' ' || u.lastname_user AS anfitrion, 
+    rr.desc_roomreview AS resena, 
+    rr.rate_room_roomreview AS calificacion 
+FROM room r 
+JOIN "user" u ON r.id_owner_room = u.id_user 
+JOIN post p ON r.id_room = p.id_room_post 
+JOIN booking b ON p.id_post = b.id_post_booking 
+JOIN room_review rr ON b.id_booking = rr.id_booking_roomreview;
+
+SELECT 
+    b.id_booking, 
+    u_huesped.name_user || ' ' || u_huesped.lastname_user AS huesped, 
+    u_anfitrion.name_user || ' ' || u_anfitrion.lastname_user AS anfitrion, 
+    r.address_room AS habitacion 
+FROM booking b 
+JOIN "user" u_huesped ON b.id_user_booking = u_huesped.id_user 
+JOIN post p ON b.id_post_booking = p.id_post 
+JOIN room r ON p.id_room_post = r.id_room 
+JOIN "user" u_anfitrion ON r.id_owner_room = u_anfitrion.id_user;
 ```
